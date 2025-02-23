@@ -1,0 +1,5 @@
+pandas
+happybase
+mysql-connector-python
+pyspark
+confluent-kafka

@@ -1,0 +1,27 @@
+services:
+  hbase:
+    image: harisekhon/hbase:1.4
+    ports:
+      - "2181:2181"  # Zookeeper
+      - "16010:16010"  # HMaster
+      - "9090:9090"  # Thrift Server
+    environment:
+      - HBASE_THRIFT_PORT=9090
+    volumes:
+      - hbase-data:/data/hbase
+
+  fraud-detection:
+    build: .
+    volumes:
+      - ./data:/app/data
+      - ./src:/app/src
+    environment:
+      - PYTHONUNBUFFERED=1
+      - HBASE_HOST=hbase
+    depends_on:
+      - hbase
+    ports:
+      - "4040:4040"  # Spark UI
+
+volumes:
+  hbase-data:
