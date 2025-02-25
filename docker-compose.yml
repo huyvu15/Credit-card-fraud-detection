@@ -11,7 +11,9 @@ services:
       - hbase-data:/data/hbase
 
   fraud-detection:
-    build: .
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
     volumes:
       - ./data:/app/data
       - ./src:/app/src

@@ -17,6 +17,7 @@ RUN wget -q "http://archive.apache.org/dist/sqoop/${SQOOP_VERSION}/sqoop-${SQOOP
     rm /tmp/sqoop.tar.gz
 
 ENV PATH="/opt/sqoop/bin:${PATH}"
+ENV PYTHONPATH="${PYTHONPATH}:/app/src/" 
 
 RUN mkdir -p /opt/spark-jars && \
     wget -q "https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.12/3.2.0/spark-sql-kafka-0-10_2.12-3.2.0.jar" -O /opt/spark-jars/spark-sql-kafka-0-10_2.12-3.2.0.jar && \
@@ -27,10 +28,10 @@ RUN mkdir -p /opt/spark-jars && \
     wget -q "https://repo1.maven.org/maven2/org/apache/spark/spark-token-provider-kafka-0-10_2.12/3.2.0/spark-token-provider-kafka-0-10_2.12-3.2.0.jar" -O /opt/spark-jars/spark-token-provider-kafka-0-10_2.12-3.2.0.jar && \
     wget -q "https://repo1.maven.org/maven2/org/apache/hbase/hbase-spark/1.4.7/hbase-spark-1.4.7.jar" -O /opt/spark-jars/hbase-spark-1.4.7.jar
 
-RUN pip3 install --no-cache-dir happybase pandas mysql-connector-python confluent-kafka py4j==0.10.9.2 geopy  # Đảm bảo pandas và geopy được cài
+RUN pip3 install --no-cache-dir happybase pandas mysql-connector-python confluent-kafka py4j==0.10.9.2 geopy  
 
 COPY sqoop/ ./sqoop/
 COPY src/ ./src/  
 COPY data/ ./data/  
 
-CMD ["sh", "-c", "until nc -z hbase 9090; do echo 'Waiting for HBase Thrift server...'; sleep 2; done; python3 src/init_hbase.py && /opt/bitnami/spark/bin/spark-submit --jars /opt/spark-jars/spark-sql-kafka-0-10_2.12-3.2.0.jar,/opt/spark-jars/spark-streaming-kafka-0-10_2.12-3.2.0.jar,/opt/spark-jars/kafka-clients-2.8.0.jar,/opt/spark-jars/commons-pool2-2.11.1.jar,/opt/spark-jars/slf4j-api-1.7.30.jar,/opt/spark-jars/spark-token-provider-kafka-0-10_2.12-3.2.0.jar,/opt/spark-jars/hbase-spark-1.4.7.jar src/task5_7_streaming.py"]
+CMD ["sh", "-c", "until nc -z hbase 9090; do echo 'Waiting for HBase Thrift server...'; sleep 2; done; /opt/bitnami/spark/bin/spark-submit --jars /opt/spark-jars/spark-sql-kafka-0-10_2.12-3.2.0.jar,/opt/spark-jars/spark-streaming-kafka-0-10_2.12-3.2.0.jar,/opt/spark-jars/kafka-clients-2.8.0.jar,/opt/spark-jars/commons-pool2-2.11.1.jar,/opt/spark-jars/slf4j-api-1.7.30.jar,/opt/spark-jars/spark-token-provider-kafka-0-10_2.12-3.2.0.jar,/opt/spark-jars/hbase-spark-1.4.7.jar --driver-python /opt/bitnami/spark/python/bin/python src/task5_7_streaming.py"]
